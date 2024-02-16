@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:uber_rider_app/screens/login_screen.dart';
 
 class SignInScreen extends StatelessWidget {
+  static const String idScreen = "register";
   const SignInScreen({super.key});
 
   @override
@@ -108,7 +110,10 @@ class SignInScreen extends StatelessWidget {
                 ),
               ),
               TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, LoginScreen.idScreen, (route) => false);
+                  },
                   child: const Text("Already have an Account ? Login Here."))
             ],
           ),
