@@ -1,11 +1,8 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:uber_rider_app/main.dart';
 import 'package:uber_rider_app/screens/main_screen.dart';
 import 'package:uber_rider_app/screens/register_screen.dart';
 import 'package:uber_rider_app/widgets/progress_dialog.dart';
