@@ -13,7 +13,12 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Main Screen"),
+        backgroundColor: Colors.lightBlue,
+        title: const Text(
+          "Main Screen",
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
       ),
     );
   }

@@ -165,15 +165,10 @@ class RegisterScreen extends StatelessWidget {
       ),
     );
 
-    UserCredential firebaseUserCredential = await _firebaseAuth
-        .createUserWithEmailAndPassword(
+    UserCredential firebaseUserCredential =
+        await _firebaseAuth.createUserWithEmailAndPassword(
             email: emailTextEditingcontroller.text,
-            password: passwordTextEditingcontroller.text)
-        // ignore: body_might_complete_normally_catch_error
-        .catchError((errorMsg) {
-      Navigator.pop(context);
-      Fluttertoast.showToast(msg: "Error: + $errorMsg");
-    });
+            password: passwordTextEditingcontroller.text);
     User? user = firebaseUserCredential.user;
 
     if (user != null) {
@@ -182,6 +177,7 @@ class RegisterScreen extends StatelessWidget {
         "name": nameTextEditingcontroller.text.trim(),
         "email": emailTextEditingcontroller.text.trim(),
         "phone": phoneTextEditingcontroller.text.trim(),
+        "password": passwordTextEditingcontroller.text.trim(),
       };
       userRef.child(user.uid).set(userDataMap);
       Fluttertoast.showToast(

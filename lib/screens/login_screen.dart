@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -120,47 +123,29 @@ class LoginScreen extends StatelessWidget {
 
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  loginAndAuthenticateUser(BuildContext context) async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) => ProgressDialog(
-        message: "Authenticating, Please wait ...",
-      ),
-    );
+  Future<void> loginAndAuthenticateUser(BuildContext context) async {
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) => ProgressDialog(
+          message: "Authenticating, Please wait ...",
+        ),
+      );
 
-    UserCredential firebaseUserCredential = await _firebaseAuth
-        .signInWithEmailAndPassword(
-            email: emailTextEditingcontroller.text,
-            password: passwordTextEditingcontroller.text)
-        // ignore: body_might_complete_normally_catch_error
-        .catchError((errorMsg) {
-      Navigator.pop(context);
-      Fluttertoast.showToast(msg: "Error: + $errorMsg");
-    });
-    User? user = firebaseUserCredential.user;
-
-    if (user != null) {
-      // Save Info User To Databse
-      userRef.child(user.uid).once().then((value) => (DataSnapshot snap) {
-            if (snap.value != null) {
-              // ignore: use_build_context_synchronously
-              Navigator.pushNamedAndRemoveUntil(
-                  context, MainScreen.idScreen, (route) => false);
-              Fluttertoast.showToast(msg: "You are logged-in now.");
-            } else {
-              Navigator.pop(context);
-              _firebaseAuth.signOut();
-              Fluttertoast.showToast(
-                  msg:
-                      "No record exists for this user. Please create new account.");
-            }
-          });
-    } else {
-      // Error Occured
+      await _firebaseAuth.signInWithEmailAndPassword(
+          email: emailTextEditingcontroller.text.trim(),
+          password: passwordTextEditingcontroller.text.trim());
+      Fluttertoast.showToast(
+          msg: "Congratulations, your have logged successfuly.");
       // ignore: use_build_context_synchronously
-      Navigator.pop(context);
-      Fluttertoast.showToast(msg: "Error occurec, can be log-in.");
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        MainScreen.idScreen,
+        (route) => false,
+      );
+    } catch (error) {
+      Fluttertoast.showToast(msg: "Error has been occured, $error");
     }
   }
 }
