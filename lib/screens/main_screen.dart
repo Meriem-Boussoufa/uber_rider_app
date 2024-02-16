@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:uber_rider_app/widgets/divider.dart';
 
@@ -18,6 +19,23 @@ class _MainScreenState extends State<MainScreen> {
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   static const CameraPosition _kGooglePlex = CameraPosition(
       target: LatLng(37.42796133580664, -122.085749655962), zoom: 14.4746);
+
+  Position? currentPosition;
+  var geoLocator = Geolocator();
+
+  double bottomPaddingOfMap = 0;
+
+  void locatePosition() async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    currentPosition = position;
+    LatLng latLatPosition = LatLng(position.latitude, position.longitude);
+    CameraPosition cameraPosition =
+        CameraPosition(target: latLatPosition, zoom: 14);
+    newGoogleMapController!
+        .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,12 +107,20 @@ class _MainScreenState extends State<MainScreen> {
       ),
       body: Stack(children: [
         GoogleMap(
+          padding: EdgeInsets.only(bottom: bottomPaddingOfMap),
           myLocationButtonEnabled: true,
           mapType: MapType.normal,
           initialCameraPosition: _kGooglePlex,
+          zoomControlsEnabled: true,
+          zoomGesturesEnabled: true,
           onMapCreated: (GoogleMapController controller) {
             _controllerGoogleMap.complete(controller);
             newGoogleMapController = controller;
+
+            setState(() {
+              bottomPaddingOfMap = 300.0;
+            });
+            locatePosition();
           },
         ),
         Positioned(
