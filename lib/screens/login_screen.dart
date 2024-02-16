@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uber_rider_app/main.dart';
 import 'package:uber_rider_app/screens/main_screen.dart';
 import 'package:uber_rider_app/screens/register_screen.dart';
+import 'package:uber_rider_app/widgets/progress_dialog.dart';
 
 class LoginScreen extends StatelessWidget {
   static const String idScreen = "login";
@@ -119,10 +120,22 @@ class LoginScreen extends StatelessWidget {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   loginAndAuthenticateUser(BuildContext context) async {
-    UserCredential firebaseUserCredential =
-        await _firebaseAuth.signInWithEmailAndPassword(
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => ProgressDialog(
+        message: "Authenticating, Please wait ...",
+      ),
+    );
+
+    UserCredential firebaseUserCredential = await _firebaseAuth
+        .signInWithEmailAndPassword(
             email: emailTextEditingcontroller.text,
-            password: passwordTextEditingcontroller.text);
+            password: passwordTextEditingcontroller.text)
+        .catchError((errorMsg) {
+      Navigator.pop(context);
+      Fluttertoast.showToast(msg: "Error: + $errorMsg");
+    });
     User? user = firebaseUserCredential.user;
 
     if (user != null) {
@@ -134,6 +147,7 @@ class LoginScreen extends StatelessWidget {
                   context, MainScreen.idScreen, (route) => false);
               Fluttertoast.showToast(msg: "You are logged-in now.");
             } else {
+              Navigator.pop(context);
               _firebaseAuth.signOut();
               Fluttertoast.showToast(
                   msg:
@@ -142,7 +156,9 @@ class LoginScreen extends StatelessWidget {
           });
     } else {
       // Error Occured
-      Fluttertoast.showToast(msg: "New User account has not been Created.");
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
+      Fluttertoast.showToast(msg: "Error occurec, can be log-in.");
     }
   }
 }

@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:uber_rider_app/main.dart';
 import 'package:uber_rider_app/screens/login_screen.dart';
 import 'package:uber_rider_app/screens/main_screen.dart';
+import 'package:uber_rider_app/widgets/progress_dialog.dart';
 
 class RegisterScreen extends StatelessWidget {
   static const String idScreen = "register";
@@ -155,10 +156,22 @@ class RegisterScreen extends StatelessWidget {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   void registerNewUser(BuildContext context) async {
-    UserCredential firebaseUserCredential =
-        await _firebaseAuth.createUserWithEmailAndPassword(
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => ProgressDialog(
+        message: "Registering, Please wait ...",
+      ),
+    );
+
+    UserCredential firebaseUserCredential = await _firebaseAuth
+        .createUserWithEmailAndPassword(
             email: emailTextEditingcontroller.text,
-            password: passwordTextEditingcontroller.text);
+            password: passwordTextEditingcontroller.text)
+        .catchError((errorMsg) {
+      Navigator.pop(context);
+      Fluttertoast.showToast(msg: "Error: + $errorMsg");
+    });
     User? user = firebaseUserCredential.user;
 
     if (user != null) {
@@ -176,6 +189,8 @@ class RegisterScreen extends StatelessWidget {
           context, MainScreen.idScreen, (route) => false);
     } else {
       // Error Occured
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
       Fluttertoast.showToast(msg: "New User account has not been Created.");
     }
   }
