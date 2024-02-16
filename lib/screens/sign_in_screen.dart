@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class SignInScreen extends StatelessWidget {
+  const SignInScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class LoginScreen extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(
-                height: 35.0,
+                height: 20.0,
               ),
               const Image(
                 image: AssetImage("assets/images/logo.png"),
@@ -23,7 +23,7 @@ class LoginScreen extends StatelessWidget {
               ),
               const SizedBox(height: 15.0),
               const Text(
-                "Login as a Rider",
+                "Register as a Rider",
                 style: TextStyle(fontSize: 24.0, fontFamily: "Brand Bold"),
                 textAlign: TextAlign.center,
               ),
@@ -32,10 +32,37 @@ class LoginScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
+                    const SizedBox(height: 5),
+                    const TextField(
+                      keyboardType: TextInputType.text,
+                      decoration: InputDecoration(
+                        labelText: "Name",
+                        labelStyle: TextStyle(fontSize: 14.0),
+                        hintStyle: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 10,
+                        ),
+                      ),
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    const SizedBox(height: 5),
                     const TextField(
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                         labelText: "Email",
+                        labelStyle: TextStyle(fontSize: 14.0),
+                        hintStyle: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 10,
+                        ),
+                      ),
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    const SizedBox(height: 5),
+                    const TextField(
+                      keyboardType: TextInputType.phone,
+                      decoration: InputDecoration(
+                        labelText: "Phone",
                         labelStyle: TextStyle(fontSize: 14.0),
                         hintStyle: TextStyle(
                           color: Colors.grey,
@@ -68,7 +95,7 @@ class LoginScreen extends StatelessWidget {
                         onPressed: () {},
                         child: const Center(
                           child: Text(
-                            "Login",
+                            "Register",
                             style: TextStyle(
                                 fontSize: 20.0,
                                 fontFamily: "Brand Bold",
@@ -82,7 +109,7 @@ class LoginScreen extends StatelessWidget {
               ),
               TextButton(
                   onPressed: () {},
-                  child: const Text("Do not have an Account ? Register Here."))
+                  child: const Text("Already have an Account ? Login Here."))
             ],
           ),
         ),
