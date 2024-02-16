@@ -1,9 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:uber_rider_app/main.dart';
+import 'package:uber_rider_app/screens/main_screen.dart';
 import 'package:uber_rider_app/screens/register_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   static const String idScreen = "login";
-  const LoginScreen({super.key});
+  LoginScreen({super.key});
+
+  TextEditingController emailTextEditingcontroller = TextEditingController();
+  TextEditingController passwordTextEditingcontroller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -34,9 +42,10 @@ class LoginScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    const TextField(
+                    TextField(
+                      controller: emailTextEditingcontroller,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: "Email",
                         labelStyle: TextStyle(fontSize: 14.0),
                         hintStyle: TextStyle(
@@ -44,12 +53,13 @@ class LoginScreen extends StatelessWidget {
                           fontSize: 10,
                         ),
                       ),
-                      style: TextStyle(fontSize: 14),
+                      style: const TextStyle(fontSize: 14),
                     ),
                     const SizedBox(height: 5),
-                    const TextField(
+                    TextField(
+                      controller: passwordTextEditingcontroller,
                       obscureText: true,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: "Password",
                         labelStyle: TextStyle(fontSize: 14.0),
                         hintStyle: TextStyle(
@@ -57,7 +67,7 @@ class LoginScreen extends StatelessWidget {
                           fontSize: 10,
                         ),
                       ),
-                      style: TextStyle(fontSize: 14),
+                      style: const TextStyle(fontSize: 14),
                     ),
                     const SizedBox(height: 30),
                     SizedBox(
@@ -67,7 +77,18 @@ class LoginScreen extends StatelessWidget {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.yellow, // Background color
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          if (!emailTextEditingcontroller.text.contains('@')) {
+                            Fluttertoast.showToast(
+                                msg: "Email Address is not valid.");
+                          } else if (passwordTextEditingcontroller.text.length <
+                              6) {
+                            Fluttertoast.showToast(
+                                msg: "Password is mandatory.");
+                          } else {
+                            loginAndAuthenticateUser(context);
+                          }
+                        },
                         child: const Center(
                           child: Text(
                             "Login",
@@ -93,5 +114,35 @@ class LoginScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+  loginAndAuthenticateUser(BuildContext context) async {
+    UserCredential firebaseUserCredential =
+        await _firebaseAuth.signInWithEmailAndPassword(
+            email: emailTextEditingcontroller.text,
+            password: passwordTextEditingcontroller.text);
+    User? user = firebaseUserCredential.user;
+
+    if (user != null) {
+      // Save Info User To Databse
+      userRef.child(user.uid).once().then((value) => (DataSnapshot snap) {
+            if (snap.value != null) {
+              // ignore: use_build_context_synchronously
+              Navigator.pushNamedAndRemoveUntil(
+                  context, MainScreen.idScreen, (route) => false);
+              Fluttertoast.showToast(msg: "You are logged-in now.");
+            } else {
+              _firebaseAuth.signOut();
+              Fluttertoast.showToast(
+                  msg:
+                      "No record exists for this user. Please create new account.");
+            }
+          });
+    } else {
+      // Error Occured
+      Fluttertoast.showToast(msg: "New User account has not been Created.");
+    }
   }
 }

@@ -176,6 +176,7 @@ class RegisterScreen extends StatelessWidget {
           context, MainScreen.idScreen, (route) => false);
     } else {
       // Error Occured
+      Fluttertoast.showToast(msg: "New User account has not been Created.");
     }
   }
 }
