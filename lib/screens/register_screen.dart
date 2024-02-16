@@ -6,6 +6,7 @@ import 'package:uber_rider_app/screens/login_screen.dart';
 import 'package:uber_rider_app/screens/main_screen.dart';
 import 'package:uber_rider_app/widgets/progress_dialog.dart';
 
+// ignore: must_be_immutable
 class RegisterScreen extends StatelessWidget {
   static const String idScreen = "register";
   RegisterScreen({super.key});
@@ -168,6 +169,7 @@ class RegisterScreen extends StatelessWidget {
         .createUserWithEmailAndPassword(
             email: emailTextEditingcontroller.text,
             password: passwordTextEditingcontroller.text)
+        // ignore: body_might_complete_normally_catch_error
         .catchError((errorMsg) {
       Navigator.pop(context);
       Fluttertoast.showToast(msg: "Error: + $errorMsg");
