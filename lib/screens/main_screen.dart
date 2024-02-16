@@ -15,18 +15,77 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   final Completer<GoogleMapController> _controllerGoogleMap = Completer();
   GoogleMapController? newGoogleMapController;
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   static const CameraPosition _kGooglePlex = CameraPosition(
       target: LatLng(37.42796133580664, -122.085749655962), zoom: 14.4746);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         backgroundColor: Colors.lightBlue,
-        title: const Text(
-          "Main Screen",
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text("Main Screen", style: TextStyle(color: Colors.white)),
         centerTitle: true,
+      ),
+      drawer: Container(
+        color: Colors.white,
+        width: 255,
+        child: Drawer(
+          child: ListView(
+            children: [
+              SizedBox(
+                height: 165,
+                child: DrawerHeader(
+                    decoration: const BoxDecoration(color: Colors.white),
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          "assets/images/user_icon.png",
+                          height: 65,
+                          width: 65,
+                        ),
+                        const SizedBox(width: 16.0),
+                        const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Profile Name",
+                              style: TextStyle(
+                                  fontSize: 16, fontFamily: "Brand-Bold"),
+                            ),
+                            SizedBox(height: 6.0),
+                            Text("Visit Profile"),
+                          ],
+                        )
+                      ],
+                    )),
+              ),
+              const DividerWidget(),
+              const SizedBox(height: 12.0),
+              const ListTile(
+                leading: Icon(Icons.history),
+                title: Text(
+                  "History",
+                  style: TextStyle(fontSize: 15.0),
+                ),
+              ),
+              const ListTile(
+                leading: Icon(Icons.person),
+                title: Text(
+                  "Visit Profile",
+                  style: TextStyle(fontSize: 15.0),
+                ),
+              ),
+              const ListTile(
+                leading: Icon(Icons.info),
+                title: Text(
+                  "About",
+                  style: TextStyle(fontSize: 15.0),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
       body: Stack(children: [
         GoogleMap(
@@ -37,6 +96,36 @@ class _MainScreenState extends State<MainScreen> {
             _controllerGoogleMap.complete(controller);
             newGoogleMapController = controller;
           },
+        ),
+        Positioned(
+          top: 45,
+          left: 22,
+          child: GestureDetector(
+            onTap: () {
+              scaffoldKey.currentState!.openDrawer();
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(22),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black,
+                      blurRadius: 6.0,
+                      spreadRadius: 0.5,
+                      offset: Offset(0.7, 0.7),
+                    ),
+                  ]),
+              child: const CircleAvatar(
+                backgroundColor: Colors.white,
+                radius: 20.0,
+                child: Icon(
+                  Icons.menu,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
         ),
         Positioned(
           left: 0.0,
