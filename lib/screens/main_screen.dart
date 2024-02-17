@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:uber_rider_app/widgets/divider.dart';
 
 class MainScreen extends StatefulWidget {
@@ -26,14 +28,27 @@ class _MainScreenState extends State<MainScreen> {
   double bottomPaddingOfMap = 0;
 
   void locatePosition() async {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    currentPosition = position;
-    LatLng latLatPosition = LatLng(position.latitude, position.longitude);
-    CameraPosition cameraPosition =
-        CameraPosition(target: latLatPosition, zoom: 14);
-    newGoogleMapController!
-        .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    // Check if permission is granted
+    var permissionStatus = await Permission.location.request();
+
+    if (permissionStatus.isGranted) {
+      try {
+        // Attempt to get current position
+        Position position = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high);
+        currentPosition = position;
+        LatLng latLatPosition = LatLng(position.latitude, position.longitude);
+        CameraPosition cameraPosition =
+            CameraPosition(target: latLatPosition, zoom: 14);
+        newGoogleMapController!
+            .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+      } catch (e) {
+        Fluttertoast.showToast(msg: "Error getting location: $e");
+      }
+    } else {
+      // Handle case where permission is denied
+      Fluttertoast.showToast(msg: "Location permission denied");
+    }
   }
 
   @override
@@ -41,6 +56,7 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
+        iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.lightBlue,
         title: const Text("Main Screen", style: TextStyle(color: Colors.white)),
         centerTitle: true,
