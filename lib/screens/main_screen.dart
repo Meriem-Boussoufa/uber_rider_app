@@ -6,7 +6,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'package:uber_rider_app/assistants/assistant_methods.dart';
+import 'package:uber_rider_app/data_handler/app_data.dart';
 import 'package:uber_rider_app/widgets/divider.dart';
 
 class MainScreen extends StatefulWidget {
@@ -45,7 +47,8 @@ class _MainScreenState extends State<MainScreen> {
         newGoogleMapController!
             .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
         String address =
-            await AssistantMethods.searchCoordinateAddress(position);
+            // ignore: use_build_context_synchronously
+            await AssistantMethods.searchCoordinateAddress(position, context);
         log("This is your Address :: $address");
       } catch (e) {
         Fluttertoast.showToast(msg: "Error getting location: $e");
@@ -237,19 +240,25 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                   ),
                   const SizedBox(height: 24.0),
-                  const Row(
+                  Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.home,
                         color: Colors.grey,
                       ),
-                      SizedBox(width: 12.0),
+                      const SizedBox(width: 12.0),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Add Home"),
-                          SizedBox(height: 4.0),
-                          Text(
+                          Text(Provider.of<AppData>(context).pickUpLocation !=
+                                  null
+                              ? Provider.of<AppData>(context)
+                                  .pickUpLocation!
+                                  .placeName
+                                  .toString()
+                              : "Add Home"),
+                          const SizedBox(height: 4.0),
+                          const Text(
                             "Your living home address",
                             style: TextStyle(
                               color: Colors.black45,
