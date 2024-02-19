@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:uber_rider_app/assistants/assistant_methods.dart';
 import 'package:uber_rider_app/widgets/divider.dart';
 
 class MainScreen extends StatefulWidget {
@@ -42,6 +44,9 @@ class _MainScreenState extends State<MainScreen> {
             CameraPosition(target: latLatPosition, zoom: 14);
         newGoogleMapController!
             .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+        String address =
+            await AssistantMethods.searchCoordinateAddress(position);
+        log("This is your Address :: $address");
       } catch (e) {
         Fluttertoast.showToast(msg: "Error getting location: $e");
       }
