@@ -9,6 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:uber_rider_app/assistants/assistant_methods.dart';
 import 'package:uber_rider_app/data_handler/app_data.dart';
+import 'package:uber_rider_app/screens/search_screen.dart';
 import 'package:uber_rider_app/widgets/divider.dart';
 
 class MainScreen extends StatefulWidget {
@@ -212,30 +213,38 @@ class _MainScreenState extends State<MainScreen> {
                     style: TextStyle(fontSize: 12.0, fontFamily: "Brand-Bold"),
                   ),
                   const SizedBox(height: 20.0),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(5.0),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black54,
-                          blurRadius: 6.0,
-                          spreadRadius: 0.5,
-                          offset: Offset(0.7, 0.7),
-                        ),
-                      ],
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.all(12.0),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.search,
-                            color: Colors.blueAccent,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SearchScreen()));
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(5.0),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black54,
+                            blurRadius: 6.0,
+                            spreadRadius: 0.5,
+                            offset: Offset(0.7, 0.7),
                           ),
-                          SizedBox(width: 10.0),
-                          Text("Search Drop Off")
                         ],
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.all(12.0),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.search,
+                              color: Colors.blueAccent,
+                            ),
+                            SizedBox(width: 10.0),
+                            Text("Search Drop Off")
+                          ],
+                        ),
                       ),
                     ),
                   ),
