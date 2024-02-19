@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:uber_rider_app/assistants/request_assistant.dart';
@@ -14,13 +16,14 @@ class AssistantMethods {
 
     var response = await RequestAssistant.getRequest(url);
     if (response != "failed") {
-      //placeAddress = response["results"][0]["formatted_address"];
+      placeAddress = response["results"][0]["formatted_address"];
 
-      st1 = response["results"][0]["address_components"][0]["long_name"];
-      st2 = response["results"][0]["address_components"][1]["long_name"];
-      st3 = response["results"][0]["address_components"][5]["long_name"];
-      st4 = response["results"][0]["address_components"][6]["long_name"];
-      placeAddress = "$st1 , $st2 , $st3 , $st4";
+      // st1 = response["results"][0]["address_components"][0]["long_name"];
+      // st2 = response["results"][0]["address_components"][1]["long_name"];
+      // st3 = response["results"][0]["address_components"][5]["long_name"];
+      // st4 = response["results"][0]["address_components"][6]["long_name"];
+      // placeAddress = "$st1 , $st2 , $st3 , $st4";
+      log(placeAddress);
 
       Address userPickUpAdress = Address();
       userPickUpAdress.longtitude = position.longitude;
