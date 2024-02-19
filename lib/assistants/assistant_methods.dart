@@ -10,7 +10,6 @@ class AssistantMethods {
   static Future<String> searchCoordinateAddress(
       Position position, context) async {
     String placeAddress = "";
-    String st1, st2, st3, st4;
     String url =
         "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=AIzaSyA5uLRfE1Ea9ie7ei9PGHJT43VQVm-IQCM";
 
