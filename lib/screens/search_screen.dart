@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:uber_rider_app/assistants/request_assistant.dart';
 
 import '../data_handler/app_data.dart';
 
@@ -61,10 +64,10 @@ class _SearchScreenState extends State<SearchScreen> {
                     children: [
                       Image.asset(
                         "assets/images/pickicon.png",
-                        height: 16.0,
-                        width: 16.0,
+                        height: 20.0,
+                        width: 20.0,
                       ),
-                      const SizedBox(height: 18.0),
+                      const SizedBox(width: 18.0),
                       Expanded(
                           child: Container(
                         decoration: BoxDecoration(
@@ -93,10 +96,10 @@ class _SearchScreenState extends State<SearchScreen> {
                     children: [
                       Image.asset(
                         "assets/images/desticon.png",
-                        height: 16.0,
-                        width: 16.0,
+                        height: 20.0,
+                        width: 20.0,
                       ),
-                      const SizedBox(height: 18.0),
+                      const SizedBox(width: 18.0),
                       Expanded(
                           child: Container(
                         decoration: BoxDecoration(
@@ -105,6 +108,9 @@ class _SearchScreenState extends State<SearchScreen> {
                         child: Padding(
                           padding: const EdgeInsets.all(3.0),
                           child: TextField(
+                            onChanged: (val) {
+                              findPlace(val);
+                            },
                             controller: dropOffTextEditingController,
                             decoration: InputDecoration(
                               hintText: "Where to ?",
@@ -127,5 +133,17 @@ class _SearchScreenState extends State<SearchScreen> {
         ],
       ),
     );
+  }
+
+  void findPlace(String placeName) async {
+    if (placeName.length > 1) {
+      String autoCompleteUrl =
+          "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$placeName&key=AIzaSyA5uLRfE1Ea9ie7ei9PGHJT43VQVm-IQCM&sessiontoken=1234567890&components=country:dz";
+      var res = await RequestAssistant.getRequest(autoCompleteUrl);
+      if (res == "failed") {
+        return;
+      }
+      log("PLaces Predictions Response :: $res");
+    }
   }
 }
