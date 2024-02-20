@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uber_rider_app/assistants/request_assistant.dart';
+import 'package:uber_rider_app/models/place_prediction.dart';
+import 'package:uber_rider_app/widgets/divider.dart';
 
 import '../data_handler/app_data.dart';
 
@@ -16,12 +18,14 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   TextEditingController pickUpTextEditingController = TextEditingController();
   TextEditingController dropOffTextEditingController = TextEditingController();
+  List<PlacePrediction> placePredictionList = [];
   @override
   Widget build(BuildContext context) {
     String placeAddress =
         Provider.of<AppData>(context).pickUpLocation!.placeName ?? "";
     pickUpTextEditingController.text = placeAddress;
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Column(
         children: [
           Container(
@@ -129,7 +133,29 @@ class _SearchScreenState extends State<SearchScreen> {
                 ],
               ),
             ),
-          )
+          ),
+          // Tile for Predictions
+          (placePredictionList.isNotEmpty)
+              ? Expanded(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 0.0, horizontal: 16.0),
+                      child: ListView.separated(
+                        itemBuilder: (context, index) {
+                          return PredictionTile(
+                              placePrediction: placePredictionList[index]);
+                        },
+                        separatorBuilder: (context, index) =>
+                            const DividerWidget(),
+                        itemCount: placePredictionList.length,
+                        shrinkWrap: true,
+                        physics: const ClampingScrollPhysics(),
+                      ),
+                    ),
+                  ),
+                )
+              : Container(),
         ],
       ),
     );
@@ -144,6 +170,52 @@ class _SearchScreenState extends State<SearchScreen> {
         return;
       }
       log("PLaces Predictions Response :: $res");
+      if (res["status"] == "OK") {
+        var predictions = res["predictions"];
+        var placesList = (predictions as List)
+            .map((e) => PlacePrediction.fromJson(e))
+            .toList();
+        setState(() {
+          placePredictionList = placesList;
+        });
+      }
     }
+  }
+}
+
+class PredictionTile extends StatelessWidget {
+  final PlacePrediction placePrediction;
+  const PredictionTile({super.key, required this.placePrediction});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      const SizedBox(width: 10.0),
+      Row(children: [
+        const Icon(Icons.add_location),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 8.0),
+              Text(
+                placePrediction.mainText.toString(),
+                style: const TextStyle(fontSize: 16),
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2.0),
+              Text(
+                placePrediction.secondaryText.toString(),
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 12.0, color: Colors.grey),
+              ),
+              const SizedBox(height: 8.0),
+            ],
+          ),
+        ),
+      ]),
+      const SizedBox(width: 10.0),
+    ]);
   }
 }
