@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +9,9 @@ import 'package:uber_rider_app/assistants/request_assistant.dart';
 import 'package:uber_rider_app/data_handler/app_data.dart';
 import 'package:uber_rider_app/models/address.dart';
 import 'package:uber_rider_app/models/direction_details.dart';
+
+import '../models/user.dart';
+import '../static/config.dart';
 
 class AssistantMethods {
   static Future<String> searchCoordinateAddress(
@@ -68,5 +73,26 @@ class AssistantMethods {
     //1$ = 160 RS;
     //double totalLocalAmount = totalFareAmount * 160;
     return totalFareAmount.truncate();
+  }
+
+  static void getCurrentOnlineUserInfo() async {
+    log("###### Entered Get Current Online User Info ######");
+    User? firebase = FirebaseAuth.instance.currentUser;
+    String userId = firebase!.uid;
+    DatabaseReference reference =
+        FirebaseDatabase.instance.ref().child("users").child(userId);
+
+    try {
+      log("Entered Try Function");
+      DataSnapshot dataSnapshot = (await reference.once()).snapshot;
+      if (dataSnapshot.value != null) {
+        userCurrentInfo = Users.fromSnapshot(dataSnapshot);
+        log("................ Current User Name ...........................");
+        log(userCurrentInfo!.name.toString());
+      }
+    } catch (e) {
+      log("Entered Catch Error Function");
+      log("Error: $e");
+    }
   }
 }

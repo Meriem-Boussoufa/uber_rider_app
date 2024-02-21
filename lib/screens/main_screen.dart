@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -18,6 +19,7 @@ import 'package:uber_rider_app/widgets/divider.dart';
 import 'package:uber_rider_app/widgets/progress_dialog.dart';
 
 import '../models/address.dart';
+import '../static/config.dart';
 
 class MainScreen extends StatefulWidget {
   static const String idScreen = "mainScreen";
@@ -28,6 +30,42 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
+  DatabaseReference? rideRequestRef;
+  void saveRideRequest() {
+    log("######### Saving Ride Request ##########" "");
+    rideRequestRef =
+        FirebaseDatabase.instance.ref().child("Ride Requests").push();
+    var pickUp = Provider.of<AppData>(context, listen: false).pickUpLocation;
+    var dropOff = Provider.of<AppData>(context, listen: false).dropOffLocation;
+    Map pickUpLocMap = {
+      "latitude": pickUp!.latitude.toString(),
+      "longtitude": pickUp.longtitude.toString(),
+    };
+    Map dropOffLocMap = {
+      "latitude": dropOff!.latitude.toString(),
+      "longtitude": dropOff.longtitude.toString(),
+    };
+
+    Map riderInfoMap = {
+      "driver_id": "waiting",
+      "payment_method": "cash",
+      "pickup": pickUpLocMap,
+      "dropoff": dropOffLocMap,
+      "created_at": DateTime.now().toString(),
+      "rider_name": userCurrentInfo!.name,
+      "rider_phone": userCurrentInfo!.phone,
+      "pickup_address": pickUp.placeName,
+      "dropoff_address": dropOff.placeName,
+    };
+    rideRequestRef!.set(riderInfoMap);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    AssistantMethods.getCurrentOnlineUserInfo();
+  }
+
   bool drawerOpen = true;
 
   DirectionDetails? tripDirectionDetails;
@@ -46,6 +84,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       drawerOpen = true;
       searchContainerHeight = 300;
       rideDetailsContainer = 0;
+      requestRidecontainerHeight = 0;
       bottomPaddingOfMap = 230;
       polylineSet.clear();
       markers.clear();
@@ -104,11 +143,18 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     }
   }
 
+  void cancelRideRequest() {
+    rideRequestRef!.remove();
+  }
+
   void displayRequestRideContainer() {
     setState(() {
       requestRidecontainerHeight = 250;
       rideDetailsContainer = 0;
+      bottomPaddingOfMap = 230;
+      drawerOpen = true;
     });
+    saveRideRequest();
   }
 
   @override
@@ -465,7 +511,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                                 MaterialStateProperty.resolveWith<Color>(
                                     (states) => Colors.blue),
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            displayRequestRideContainer();
+                          },
                           child: const Padding(
                             padding: EdgeInsets.all(17),
                             child: Row(
@@ -568,20 +616,26 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                       },
                     ),
                   ),
-                  const SizedBox(height: 22),
-                  Container(
-                    height: 60,
-                    width: 60,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(26),
-                        border: Border.all(
-                          width: 2.0,
-                          color: Colors.grey,
-                        )),
-                    child: const Icon(
-                      Icons.close,
-                      size: 26,
+                  const SizedBox(height: 10),
+                  GestureDetector(
+                    onTap: () {
+                      cancelRideRequest();
+                      resetApp();
+                    },
+                    child: Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(26),
+                          border: Border.all(
+                            width: 2.0,
+                            color: Colors.grey,
+                          )),
+                      child: const Icon(
+                        Icons.close,
+                        size: 26,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
