@@ -10,7 +10,7 @@ class Users {
   Users.fromSnapshot(DataSnapshot dataSnapshot) {
     final values = dataSnapshot.value as Map<Object?, dynamic>;
     id = dataSnapshot.key;
-    email = values!["email"];
+    email = values["email"];
     name = values["name"];
     phone = values["phone"];
   }

@@ -508,6 +508,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                       padding: EdgeInsets.symmetric(horizontal: 20.0),
                       child: Row(
                         children: [
+                          // ignore: deprecated_member_use
                           Icon(FontAwesomeIcons.moneyCheckAlt,
                               size: 18, color: Colors.black54),
                           SizedBox(width: 16),
