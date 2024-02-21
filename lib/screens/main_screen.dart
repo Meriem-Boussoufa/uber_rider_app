@@ -11,6 +11,9 @@ import 'package:uber_rider_app/assistants/assistant_methods.dart';
 import 'package:uber_rider_app/data_handler/app_data.dart';
 import 'package:uber_rider_app/screens/search_screen.dart';
 import 'package:uber_rider_app/widgets/divider.dart';
+import 'package:uber_rider_app/widgets/progress_dialog.dart';
+
+import '../models/address.dart';
 
 class MainScreen extends StatefulWidget {
   static const String idScreen = "mainScreen";
@@ -214,11 +217,14 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                   const SizedBox(height: 20.0),
                   GestureDetector(
-                    onTap: () {
-                      Navigator.push(
+                    onTap: () async {
+                      var res = await Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => const SearchScreen()));
+                      if (res == "obtainDirection") {
+                        await getPlaceDirection();
+                      }
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -311,5 +317,39 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ]),
     );
+  }
+
+  Future<void> getPlaceDirection() async {
+    Address? initialPos =
+        Provider.of<AppData>(context, listen: false).pickUpLocation;
+    Address? finalPos =
+        Provider.of<AppData>(context, listen: false).dropOffLocation;
+    log(initialPos!.longtitude.toString());
+    log(initialPos.latitude.toString());
+    log(finalPos!.longtitude.toString());
+    log(finalPos.latitude.toString());
+    if (initialPos.longtitude != null && finalPos.latitude != null) {
+      log("The initialPos and the FinalPos are not null");
+      var pickUpLatLng =
+          LatLng(initialPos.latitude ?? 0.0, initialPos.longtitude ?? 0.0);
+      var dropOffLatLng =
+          LatLng(finalPos.latitude ?? 0.0, finalPos.longtitude ?? 0.0);
+      log(pickUpLatLng.toString());
+      log(dropOffLatLng.toString());
+      showDialog(
+          context: context,
+          builder: (BuildContext context) => ProgressDialog(
+                message: "Please wait ...",
+              ));
+      var details = await AssistantMethods.obtainPlaceDirectionDetails(
+          pickUpLatLng, dropOffLatLng);
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
+      log("This is Encoded points :: ");
+      log(details!.encodedPoints.toString());
+    } else {
+      log("The initialPos and the FinalPos are null");
+      // Handle the case when either initialPos or finalPos is null
+    }
   }
 }

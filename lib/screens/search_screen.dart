@@ -239,7 +239,10 @@ class PredictionTile extends StatelessWidget {
 
   void getPlaceAddressDetails(String placeId, context) async {
     showDialog(
-        context: context, builder: (BuildContext context) => ProgressDialog());
+        context: context,
+        builder: (BuildContext context) => ProgressDialog(
+              message: "Please wait ...",
+            ));
     String placeDetailsUrl =
         "https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=AIzaSyA5uLRfE1Ea9ie7ei9PGHJT43VQVm-IQCM";
 
@@ -257,7 +260,10 @@ class PredictionTile extends StatelessWidget {
       Provider.of<AppData>(context, listen: false)
           .updateDropOffLocationAddress(address);
       log("This is Drop Off Location :: ");
-      log(address.placeName.toString());
+      log("Name : " + address.placeName.toString());
+      log("Longtitude : " + address.longtitude.toString());
+      log("Latitude : " + address.latitude.toString());
+      Navigator.pop(context, "obtainDirection");
     }
   }
 }
