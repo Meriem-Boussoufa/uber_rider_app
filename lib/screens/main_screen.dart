@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -223,7 +224,7 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                   const Text(
                     'Where to ?',
-                    style: TextStyle(fontSize: 12.0, fontFamily: "Brand-Bold"),
+                    style: TextStyle(fontSize: 16.0, fontFamily: "Brand-Bold"),
                   ),
                   const SizedBox(height: 20.0),
                   GestureDetector(
@@ -325,6 +326,108 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
         ),
+        Positioned(
+            bottom: 0.0,
+            left: 0.0,
+            right: 0.0,
+            child: Container(
+              height: 240,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(16.0),
+                  topRight: Radius.circular(16.0),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black,
+                      blurRadius: 16.0,
+                      spreadRadius: 0.5,
+                      offset: Offset(0.7, 0.7)),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 17),
+                child: Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      color: Colors.tealAccent[100],
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Row(children: [
+                          Image.asset(
+                            "assets/images/taxi.png",
+                            height: 70,
+                            width: 80,
+                          ),
+                          const SizedBox(width: 16.0),
+                          const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Car",
+                                style: TextStyle(
+                                    fontSize: 18.0, fontFamily: "Brand-Bold"),
+                              ),
+                              Text(
+                                "10Km",
+                                style: TextStyle(
+                                    fontSize: 16.0, color: Colors.grey),
+                              ),
+                            ],
+                          )
+                        ]),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Row(
+                        children: [
+                          Icon(FontAwesomeIcons.moneyCheckAlt,
+                              size: 18, color: Colors.black54),
+                          SizedBox(width: 16),
+                          Text("Cash"),
+                          SizedBox(width: 6),
+                          Icon(Icons.keyboard_arrow_down,
+                              color: Colors.black54, size: 16),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                                    (states) => Colors.blue),
+                          ),
+                          onPressed: () {},
+                          child: const Padding(
+                            padding: EdgeInsets.all(17),
+                            child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Request",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Icon(FontAwesomeIcons.taxi,
+                                      color: Colors.white, size: 26),
+                                ]),
+                          )),
+                    )
+                  ],
+                ),
+              ),
+            )),
       ]),
     );
   }
