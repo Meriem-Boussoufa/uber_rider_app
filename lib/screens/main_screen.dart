@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -11,6 +12,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:uber_rider_app/assistants/assistant_methods.dart';
 import 'package:uber_rider_app/data_handler/app_data.dart';
+import 'package:uber_rider_app/models/direction_details.dart';
 import 'package:uber_rider_app/screens/search_screen.dart';
 import 'package:uber_rider_app/widgets/divider.dart';
 import 'package:uber_rider_app/widgets/progress_dialog.dart';
@@ -26,6 +28,10 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
+  bool drawerOpen = true;
+
+  DirectionDetails? tripDirectionDetails;
+
   List<LatLng> plineCoordinates = [];
   Set<Polyline> polylineSet = {};
 
@@ -33,7 +39,21 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   Set<Circle> circles = {};
 
   double rideDetailsContainer = 0;
+  double requestRidecontainerHeight = 0;
   double searchContainerHeight = 300.0;
+  resetApp() {
+    setState(() {
+      drawerOpen = true;
+      searchContainerHeight = 300;
+      rideDetailsContainer = 0;
+      bottomPaddingOfMap = 230;
+      polylineSet.clear();
+      markers.clear();
+      circles.clear();
+      plineCoordinates.clear();
+    });
+    locatePosition();
+  }
 
   void displayRideDetailsContainer() async {
     await getPlaceDirection();
@@ -41,6 +61,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       searchContainerHeight = 0;
       rideDetailsContainer = 240;
       bottomPaddingOfMap = 230;
+      drawerOpen = false;
     });
   }
 
@@ -81,6 +102,13 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       // Handle case where permission is denied
       Fluttertoast.showToast(msg: "Location permission denied");
     }
+  }
+
+  void displayRequestRideContainer() {
+    setState(() {
+      requestRidecontainerHeight = 250;
+      rideDetailsContainer = 0;
+    });
   }
 
   @override
@@ -175,11 +203,15 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           },
         ),
         Positioned(
-          top: 45,
+          top: 38,
           left: 22,
           child: GestureDetector(
             onTap: () {
-              scaffoldKey.currentState!.openDrawer();
+              if (drawerOpen) {
+                scaffoldKey.currentState!.openDrawer();
+              } else {
+                resetApp();
+              }
             },
             child: Container(
               decoration: BoxDecoration(
@@ -193,13 +225,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                       offset: Offset(0.7, 0.7),
                     ),
                   ]),
-              child: const CircleAvatar(
+              child: CircleAvatar(
                 backgroundColor: Colors.white,
                 radius: 20.0,
-                child: Icon(
-                  Icons.menu,
-                  color: Colors.black,
-                ),
+                child: Icon((drawerOpen) ? Icons.menu : Icons.close,
+                    color: Colors.black),
               ),
             ),
           ),
@@ -345,111 +375,229 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           ),
         ),
         Positioned(
-            bottom: 0.0,
-            left: 0.0,
-            right: 0.0,
-            child: AnimatedSize(
-              curve: Curves.bounceIn,
-              duration: const Duration(milliseconds: 160),
-              child: Container(
-                height: rideDetailsContainer,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(16.0),
-                    topRight: Radius.circular(16.0),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black,
-                        blurRadius: 16.0,
-                        spreadRadius: 0.5,
-                        offset: Offset(0.7, 0.7)),
+          bottom: 0.0,
+          left: 0.0,
+          right: 0.0,
+          child: AnimatedSize(
+            curve: Curves.bounceIn,
+            duration: const Duration(milliseconds: 160),
+            child: Container(
+              height: rideDetailsContainer,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(16.0),
+                  topRight: Radius.circular(16.0),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black,
+                      blurRadius: 16.0,
+                      spreadRadius: 0.5,
+                      offset: Offset(0.7, 0.7)),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 17),
+                child: Column(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      color: Colors.tealAccent[100],
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Row(children: [
+                          Image.asset(
+                            "assets/images/taxi.png",
+                            height: 70,
+                            width: 80,
+                          ),
+                          const SizedBox(width: 16.0),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Car",
+                                style: TextStyle(
+                                    fontSize: 18.0, fontFamily: "Brand-Bold"),
+                              ),
+                              Text(
+                                ((tripDirectionDetails != null)
+                                    ? tripDirectionDetails!.distanceText
+                                        .toString()
+                                    : ''),
+                                style: const TextStyle(
+                                    fontSize: 16.0, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                          Expanded(child: Container()),
+                          Text(
+                            ((tripDirectionDetails != null)
+                                ? '\$${AssistantMethods.calculateFares(tripDirectionDetails!)}'
+                                : ''),
+                            style: const TextStyle(fontFamily: "Brand-Bold"),
+                          ),
+                        ]),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Row(
+                        children: [
+                          Icon(FontAwesomeIcons.moneyCheckAlt,
+                              size: 18, color: Colors.black54),
+                          SizedBox(width: 16),
+                          Text("Cash"),
+                          SizedBox(width: 6),
+                          Icon(Icons.keyboard_arrow_down,
+                              color: Colors.black54, size: 16),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                                    (states) => Colors.blue),
+                          ),
+                          onPressed: () {},
+                          child: const Padding(
+                            padding: EdgeInsets.all(17),
+                            child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Request",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Icon(FontAwesomeIcons.taxi,
+                                      color: Colors.white, size: 26),
+                                ]),
+                          )),
+                    )
                   ],
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 17),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        color: Colors.tealAccent[100],
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Row(children: [
-                            Image.asset(
-                              "assets/images/taxi.png",
-                              height: 70,
-                              width: 80,
-                            ),
-                            const SizedBox(width: 16.0),
-                            const Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Car",
-                                  style: TextStyle(
-                                      fontSize: 18.0, fontFamily: "Brand-Bold"),
-                                ),
-                                Text(
-                                  "10Km",
-                                  style: TextStyle(
-                                      fontSize: 16.0, color: Colors.grey),
-                                ),
-                              ],
-                            )
-                          ]),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Row(
-                          children: [
-                            Icon(FontAwesomeIcons.moneyCheckAlt,
-                                size: 18, color: Colors.black54),
-                            SizedBox(width: 16),
-                            Text("Cash"),
-                            SizedBox(width: 6),
-                            Icon(Icons.keyboard_arrow_down,
-                                color: Colors.black54, size: 16),
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: 0.0,
+          left: 0.0,
+          right: 0.0,
+          child: Container(
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(16.0),
+                  topRight: Radius.circular(16.0),
+                ),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                      spreadRadius: 0.5,
+                      blurRadius: 16.0,
+                      color: Colors.black54,
+                      offset: Offset(0.7, 0.7))
+                ]),
+            height: requestRidecontainerHeight,
+            child: Padding(
+              padding: const EdgeInsets.all(30),
+              child: Column(
+                children: [
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: AnimatedTextKit(
+                      animatedTexts: [
+                        ColorizeAnimatedText(
+                          'Requesting a Ride',
+                          textStyle: const TextStyle(
+                              fontSize: 55, fontFamily: "Signatra"),
+                          textAlign: TextAlign.center,
+                          colors: [
+                            Colors.pink,
+                            Colors.green,
+                            Colors.purple,
+                            Colors.blue,
+                            Colors.yellow,
+                            Colors.red,
                           ],
                         ),
-                      ),
-                      const SizedBox(height: 24),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: ElevatedButton(
-                            style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                      (states) => Colors.blue),
-                            ),
-                            onPressed: () {},
-                            child: const Padding(
-                              padding: EdgeInsets.all(17),
-                              child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "Request",
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    Icon(FontAwesomeIcons.taxi,
-                                        color: Colors.white, size: 26),
-                                  ]),
-                            )),
-                      )
-                    ],
+                        ColorizeAnimatedText(
+                          'Please wait ...',
+                          textStyle: const TextStyle(
+                              fontSize: 55, fontFamily: "Signatra"),
+                          textAlign: TextAlign.center,
+                          colors: [
+                            Colors.pink,
+                            Colors.green,
+                            Colors.purple,
+                            Colors.blue,
+                            Colors.yellow,
+                            Colors.red,
+                          ],
+                        ),
+                        ColorizeAnimatedText(
+                          'Finding a Driver ...',
+                          textStyle: const TextStyle(
+                              fontSize: 55, fontFamily: "Signatra"),
+                          textAlign: TextAlign.center,
+                          colors: [
+                            Colors.pink,
+                            Colors.green,
+                            Colors.purple,
+                            Colors.blue,
+                            Colors.yellow,
+                            Colors.red,
+                          ],
+                        ),
+                      ],
+                      isRepeatingAnimation: true,
+                      onTap: () {
+                        log("Tap Event");
+                      },
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 22),
+                  Container(
+                    height: 60,
+                    width: 60,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(26),
+                        border: Border.all(
+                          width: 2.0,
+                          color: Colors.grey,
+                        )),
+                    child: const Icon(
+                      Icons.close,
+                      size: 26,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  const SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      "Cancel Ride",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  )
+                ],
               ),
-            )),
+            ),
+          ),
+        ),
       ]),
     );
   }
@@ -478,6 +626,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               ));
       var details = await AssistantMethods.obtainPlaceDirectionDetails(
           pickUpLatLng, dropOffLatLng);
+      setState(() {
+        tripDirectionDetails = details;
+      });
       // ignore: use_build_context_synchronously
       Navigator.pop(context);
       log("This is Encoded points :: ");
