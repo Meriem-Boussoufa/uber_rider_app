@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -29,7 +29,7 @@ class AssistantMethods {
       // st3 = response["results"][0]["address_components"][5]["long_name"];
       // st4 = response["results"][0]["address_components"][6]["long_name"];
       // placeAddress = "$st1 , $st2 , $st3 , $st4";
-      log(placeAddress);
+      //log(placeAddress);
 
       Address userPickUpAdress = Address();
       userPickUpAdress.longtitude = position.longitude;
@@ -76,23 +76,29 @@ class AssistantMethods {
   }
 
   static void getCurrentOnlineUserInfo() async {
-    log("###### Entered Get Current Online User Info ######");
+    //log("###### Entered Get Current Online User Info ######");
     User? firebase = FirebaseAuth.instance.currentUser;
     String userId = firebase!.uid;
     DatabaseReference reference =
         FirebaseDatabase.instance.ref().child("users").child(userId);
 
     try {
-      log("Entered Try Function");
+      //log("Entered Try Function");
       DataSnapshot dataSnapshot = (await reference.once()).snapshot;
       if (dataSnapshot.value != null) {
         userCurrentInfo = Users.fromSnapshot(dataSnapshot);
-        log("................ Current User Name ...........................");
-        log(userCurrentInfo!.name.toString());
+        //log("................ Current User Name ...........................");
+        //log(userCurrentInfo!.name.toString());
       }
     } catch (e) {
-      log("Entered Catch Error Function");
-      log("Error: $e");
+      //log("Entered Catch Error Function");
+      //log("Error: $e");
     }
+  }
+
+  static double createRandomNumber(int num) {
+    var random = Random();
+    int radNumber = random.nextInt(num);
+    return radNumber.toDouble();
   }
 }

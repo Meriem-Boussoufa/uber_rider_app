@@ -71,6 +71,12 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     AssistantMethods.getCurrentOnlineUserInfo();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    createIconMarker();
+  }
+
   bool drawerOpen = true;
 
   DirectionDetails? tripDirectionDetails;
@@ -139,6 +145,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             // ignore: use_build_context_synchronously
             await AssistantMethods.searchCoordinateAddress(position, context);
         log("This is your Address :: $address");
+        initGeoFireListener();
       } catch (e) {
         Fluttertoast.showToast(msg: "Error getting location: $e");
       }
@@ -161,6 +168,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     });
     saveRideRequest();
   }
+
+  bool nearbyAvailableDriverKeysLoaded = false;
+  BitmapDescriptor? nearByIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -816,10 +826,14 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             nearbyAvailableDrivers.latitude = map['latitude'];
             nearbyAvailableDrivers.longtitude = map['longtitude'];
             GeofireAssistant.nearbyAvailableDrivers.add(nearbyAvailableDrivers);
+            if (nearbyAvailableDriverKeysLoaded == true) {
+              updateavailableDriversOnMap();
+            }
             break;
 
           case Geofire.onKeyExited:
             GeofireAssistant.removeDriverFromList(map['key']);
+            updateavailableDriversOnMap();
             break;
 
           case Geofire.onKeyMoved:
@@ -830,14 +844,62 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             nearbyAvailableDrivers.longtitude = map['longtitude'];
             GeofireAssistant.updateDriverNearbybyLocation(
                 nearbyAvailableDrivers);
+            updateavailableDriversOnMap();
             break;
 
           case Geofire.onGeoQueryReady:
+            updateavailableDriversOnMap();
             break;
         }
       }
 
       setState(() {});
     });
+  }
+
+  void updateavailableDriversOnMap() {
+    setState(() {
+      markers.clear();
+    });
+    Set<Marker> tMarkers = <Marker>{};
+    for (NearbyAvailableDrivers driver
+        in GeofireAssistant.nearbyAvailableDrivers) {
+      LatLng driverAvailablePosition =
+          LatLng(driver.latitude!, driver.longtitude!);
+      Marker marker = Marker(
+        markerId: MarkerId('driver${driver.key}'),
+        position: driverAvailablePosition,
+        icon: nearByIcon!,
+        rotation: AssistantMethods.createRandomNumber(360),
+      );
+      tMarkers.add(marker);
+    }
+    setState(() {
+      markers = tMarkers;
+    });
+  }
+
+  void createIconMarker() {
+    log("############# CREATE ICON MARKER #################");
+    if (nearByIcon == null) {
+      log("........... Near By Icon Null .........");
+      ImageConfiguration imageConfiguration =
+          createLocalImageConfiguration(context, size: const Size(2, 2));
+      try {
+        log('Loading marker icon...');
+        BitmapDescriptor.fromAssetImage(
+                imageConfiguration, "assets/images/car_android.png")
+            .then((value) {
+          setState(() {
+            nearByIcon = value;
+          });
+          log('Marker icon loaded successfully');
+        });
+      } catch (e) {
+        log('Error loading marker icon: $e');
+      }
+    } else {
+      log('Marker icon already loaded');
+    }
   }
 }
