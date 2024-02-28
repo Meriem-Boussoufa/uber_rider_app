@@ -15,7 +15,8 @@ Real-time Updates: Displays real-time updates on the map during the ride, includ
 
 Check the following repositorie : https://github.com/Meriem-Boussoufa/uber_driver_app
 
-Check the following links to get more undertstand: 
+Please refer to the following links for further clarification and understanding: 
+
 - https://developers.google.com/maps/documentation/directions/get-directions
 - https://developers.google.com/maps/documentation/places/android-sdk/autocomplete
 - https://developers.google.com/maps/documentation/directions/get-directions
