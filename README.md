@@ -1,16 +1,32 @@
 # uber_rider_app
 
-A new Flutter project.
+### Features
 
-## Getting Started
+User Authentication: Users can sign up and log in to the app to access its functionalities.
 
-This project is a starting point for a Flutter application.
+Map View: Displays a map using Google Maps API, showing the user's current location and nearby landmarks.
 
-A few resources to get you started if this is your first Flutter project:
+Search Locations: Users can search for specific locations or addresses on the map.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Routing: Provides driving directions from the user's current location to their desired destination.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Real-time Updates: Displays real-time updates on the map during the ride, including the driver's location and estimated time of arrival.
+
+
+Check the following repositorie : https://github.com/Meriem-Boussoufa/uber_driver_app
+
+Check the following links to get more undertstand: 
+- https://developers.google.com/maps/documentation/directions/get-directions
+- https://developers.google.com/maps/documentation/places/android-sdk/autocomplete
+- https://developers.google.com/maps/documentation/directions/get-directions
+
+
+### Screenshoots
+
+![1](https://github.com/Meriem-Boussoufa/uber_rider_app/assets/93092761/d8305edd-017d-4ed8-bb36-29bf86c5480e)
+![2](https://github.com/Meriem-Boussoufa/uber_rider_app/assets/93092761/2658fad3-ebcd-4a33-8213-b090948526ad)
+![3](https://github.com/Meriem-Boussoufa/uber_rider_app/assets/93092761/f1f876b2-b590-4faa-b21a-d25761ac900b)
+![4](https://github.com/Meriem-Boussoufa/uber_rider_app/assets/93092761/72802cf1-1483-4492-a45b-a467dd0d1659)
+![5](https://github.com/Meriem-Boussoufa/uber_rider_app/assets/93092761/3fa136af-3ce0-4670-a802-28e3f799024e)
+![6](https://github.com/Meriem-Boussoufa/uber_rider_app/assets/93092761/ec5e8a25-ac4d-483a-a15a-b6339722f230)
+![7](https://github.com/Meriem-Boussoufa/uber_rider_app/assets/93092761/4b8faea4-18c3-441e-b7f5-6647472a2445)
