@@ -814,26 +814,25 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     Geofire.queryAtLocation(
             currentPosition!.latitude, currentPosition!.longitude, 15)!
         .listen((map) {
-      log(map);
+      log("INITGEOFIRELISTENER: This is the map : $map");
       if (map != null) {
         var callBack = map['callBack'];
-
         switch (callBack) {
           case Geofire.onKeyEntered:
             NearbyAvailableDrivers nearbyAvailableDrivers =
                 NearbyAvailableDrivers();
             nearbyAvailableDrivers.key = map['key'];
             nearbyAvailableDrivers.latitude = map['latitude'];
-            nearbyAvailableDrivers.longtitude = map['longtitude'];
+            nearbyAvailableDrivers.longtitude = map['longitude'];
             GeofireAssistant.nearbyAvailableDrivers.add(nearbyAvailableDrivers);
             if (nearbyAvailableDriverKeysLoaded == true) {
-              updateavailableDriversOnMap();
+              //updateavailableDriversOnMap();
             }
             break;
 
           case Geofire.onKeyExited:
             GeofireAssistant.removeDriverFromList(map['key']);
-            updateavailableDriversOnMap();
+            //updateavailableDriversOnMap();
             break;
 
           case Geofire.onKeyMoved:
@@ -841,10 +840,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 NearbyAvailableDrivers();
             nearbyAvailableDrivers.key = map['key'];
             nearbyAvailableDrivers.latitude = map['latitude'];
-            nearbyAvailableDrivers.longtitude = map['longtitude'];
+            nearbyAvailableDrivers.longtitude = map['longitude'];
             GeofireAssistant.updateDriverNearbybyLocation(
                 nearbyAvailableDrivers);
-            updateavailableDriversOnMap();
+            //updateavailableDriversOnMap();
             break;
 
           case Geofire.onGeoQueryReady:
@@ -858,19 +857,24 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   }
 
   void updateavailableDriversOnMap() {
+    log("************************* Update Available Drivers On Map ************************************");
+    double rotationValue = AssistantMethods.createRandomNumber(360);
     setState(() {
       markers.clear();
     });
     Set<Marker> tMarkers = <Marker>{};
     for (NearbyAvailableDrivers driver
         in GeofireAssistant.nearbyAvailableDrivers) {
+      log('### Nearby Drivers Loop ###');
       LatLng driverAvailablePosition =
           LatLng(driver.latitude!, driver.longtitude!);
+      // log(driverAvailablePosition.longitude.toString());
+      // log(driverAvailablePosition.latitude.toString());
       Marker marker = Marker(
         markerId: MarkerId('driver${driver.key}'),
         position: driverAvailablePosition,
         icon: nearByIcon!,
-        rotation: AssistantMethods.createRandomNumber(360),
+        rotation: rotationValue,
       );
       tMarkers.add(marker);
     }
